@@ -59,7 +59,7 @@ export default function DomainCard({ domain, tld, status, categoryEmoji, categor
       {status === "available" && registrars.length > 0 && (
         <div className="mt-3 space-y-1.5">
           <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Registrar Pricing (renew/yr)</p>
-          {registrars.slice(0, 3).map((r) => (
+          {registrars.slice(0, 4).map((r) => (
             <a
               key={r.name}
               href={r.url}
@@ -92,8 +92,8 @@ export default function DomainCard({ domain, tld, status, categoryEmoji, categor
               </div>
             </a>
           ))}
-          {registrars.length > 3 && (
-            <p className="text-xs text-gray-500 text-center pt-0.5">+{registrars.length - 3} more registrars</p>
+          {registrars.length > 4 && (
+            <p className="text-xs text-gray-500 text-center pt-0.5">+{registrars.length - 4} more registrars</p>
           )}
         </div>
       )}
