@@ -5,6 +5,7 @@ export interface RegistrarPrice {
   register: number;
   renew: number;
   highlight?: string;
+  currency?: string; // defaults to "USD" if not set
 }
 
 export interface TldPricing {
@@ -12,13 +13,30 @@ export interface TldPricing {
   registrars: RegistrarPrice[];
 }
 
+// Helper to build registrar search URLs for a specific domain
+export function getRegistrarSearchUrl(registrarName: string, fullDomain: string): string {
+  const name = registrarName.toLowerCase();
+  if (name === "namecheap") return `https://www.namecheap.com/domains/registration/results/?domain=${fullDomain}`;
+  if (name === "godaddy") return `https://www.godaddy.com/domainsearch/find?domainToCheck=${fullDomain}`;
+  if (name === "ionos" || name === "ionos ca") return `https://www.${name === "ionos ca" ? "ionos.ca" : "ionos.com"}/domains/domain-checker#domainName=${fullDomain}`;
+  if (name === "porkbun") return `https://porkbun.com/checkout/search?q=${fullDomain}`;
+  return ""; // fall back to static URL
+}
+
+// DomainWheel discovery URL
+export function getDomainWheelUrl(keyword: string): string {
+  return `https://domainwheel.com/?s=${encodeURIComponent(keyword)}`;
+}
+
 // Prices in USD/year (approximate, as of 2026)
+// IONOS CA prices are in CAD
 export const REGISTRAR_PRICING: Record<string, RegistrarPrice[]> = {
   ".com": [
     { name: "Porkbun", url: "https://porkbun.com", logo: "🐷", register: 9.73, renew: 10.98, highlight: "Cheapest" },
     { name: "Cloudflare", url: "https://cloudflare.com/products/registrar", logo: "🌐", register: 9.77, renew: 9.77, highlight: "At-cost" },
     { name: "Namecheap", url: "https://namecheap.com", logo: "🏷️", register: 6.98, renew: 16.98 },
     { name: "IONOS", url: "https://www.ionos.com/domains/domain-names", logo: "🔷", register: 1.00, renew: 15.00, highlight: "$1 1st yr" },
+    { name: "IONOS CA", url: "https://www.ionos.ca/domains/domain-names", logo: "🍁", register: 1.00, renew: 17.00, highlight: "CAD" },
     { name: "GoDaddy", url: "https://godaddy.com", logo: "🤠", register: 2.99, renew: 21.99 },
     { name: "Google Domains", url: "https://domains.squarespace.com", logo: "🔵", register: 12.00, renew: 12.00 },
     { name: "Name.com", url: "https://name.com", logo: "📛", register: 10.99, renew: 14.99 },
@@ -34,6 +52,7 @@ export const REGISTRAR_PRICING: Record<string, RegistrarPrice[]> = {
     { name: "Porkbun", url: "https://porkbun.com", logo: "🐷", register: 8.48, renew: 24.98 },
     { name: "Namecheap", url: "https://namecheap.com", logo: "🏷️", register: 9.98, renew: 25.98, highlight: "Popular" },
     { name: "IONOS", url: "https://www.ionos.com/domains/domain-names", logo: "🔷", register: 1.99, renew: 29.99, highlight: "$2 1st yr" },
+    { name: "IONOS CA", url: "https://www.ionos.ca/domains/domain-names", logo: "🍁", register: 2.99, renew: 34.99, highlight: "CAD" },
     { name: "Cloudflare", url: "https://cloudflare.com/products/registrar", logo: "🌐", register: 25.00, renew: 25.00 },
     { name: "GoDaddy", url: "https://godaddy.com", logo: "🤠", register: 4.99, renew: 29.99 },
     { name: "Google Domains", url: "https://domains.squarespace.com", logo: "🔵", register: 25.00, renew: 25.00 },
@@ -63,6 +82,7 @@ export const REGISTRAR_PRICING: Record<string, RegistrarPrice[]> = {
     { name: "Cloudflare", url: "https://cloudflare.com/products/registrar", logo: "🌐", register: 10.98, renew: 10.98, highlight: "At-cost" },
     { name: "Namecheap", url: "https://namecheap.com", logo: "🏷️", register: 9.98, renew: 13.98 },
     { name: "IONOS", url: "https://www.ionos.com/domains/domain-names", logo: "🔷", register: 1.00, renew: 15.00, highlight: "$1 1st yr" },
+    { name: "IONOS CA", url: "https://www.ionos.ca/domains/domain-names", logo: "🍁", register: 1.00, renew: 17.99, highlight: "CAD" },
     { name: "GoDaddy", url: "https://godaddy.com", logo: "🤠", register: 2.99, renew: 20.99 },
     { name: "Google Domains", url: "https://domains.squarespace.com", logo: "🔵", register: 12.00, renew: 12.00 },
   ],
@@ -71,12 +91,14 @@ export const REGISTRAR_PRICING: Record<string, RegistrarPrice[]> = {
     { name: "Porkbun", url: "https://porkbun.com", logo: "🐷", register: 9.73, renew: 11.48 },
     { name: "Namecheap", url: "https://namecheap.com", logo: "🏷️", register: 8.98, renew: 13.98 },
     { name: "IONOS", url: "https://www.ionos.com/domains/domain-names", logo: "🔷", register: 1.00, renew: 15.00, highlight: "$1 1st yr" },
+    { name: "IONOS CA", url: "https://www.ionos.ca/domains/domain-names", logo: "🍁", register: 1.00, renew: 15.99, highlight: "CAD" },
     { name: "GoDaddy", url: "https://godaddy.com", logo: "🤠", register: 6.99, renew: 20.99 },
   ],
   ".xyz": [
     { name: "Namecheap", url: "https://namecheap.com", logo: "🏷️", register: 1.98, renew: 12.98, highlight: "Cheapest 1st yr" },
     { name: "Porkbun", url: "https://porkbun.com", logo: "🐷", register: 2.48, renew: 2.48 },
     { name: "IONOS", url: "https://www.ionos.com/domains/domain-names", logo: "🔷", register: 1.00, renew: 9.99, highlight: "$1 1st yr" },
+    { name: "IONOS CA", url: "https://www.ionos.ca/domains/domain-names", logo: "🍁", register: 1.00, renew: 11.99, highlight: "CAD" },
     { name: "GoDaddy", url: "https://godaddy.com", logo: "🤠", register: 0.99, renew: 8.99 },
     { name: "Cloudflare", url: "https://cloudflare.com/products/registrar", logo: "🌐", register: 8.57, renew: 8.57 },
   ],

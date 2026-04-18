@@ -1,7 +1,7 @@
 "use client";
 
 import { CheckCircle, XCircle, HelpCircle, Loader2, ExternalLink } from "lucide-react";
-import { getSortedRegistrars } from "@/lib/registrars";
+import { getSortedRegistrars, getRegistrarSearchUrl, getDomainWheelUrl } from "@/lib/registrars";
 
 interface Props {
   domain: string;
@@ -59,10 +59,12 @@ export default function DomainCard({ domain, tld, status, categoryEmoji, categor
       {status === "available" && registrars.length > 0 && (
         <div className="mt-3 space-y-1.5">
           <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Registrar Pricing (renew/yr)</p>
-          {registrars.slice(0, 4).map((r) => (
+          {registrars.slice(0, 4).map((r) => {
+            const dynamicUrl = getRegistrarSearchUrl(r.name, `${domain}${tld}`);
+            return (
             <a
               key={r.name}
-              href={r.url}
+              href={dynamicUrl || r.url}
               target="_blank"
               rel="noopener noreferrer"
               className={`flex items-center justify-between px-3 py-1.5 rounded-lg transition group ${
@@ -75,7 +77,7 @@ export default function DomainCard({ domain, tld, status, categoryEmoji, categor
                 <span>{r.logo}</span>
                 <span className="text-sm text-gray-200">{r.name}</span>
                 {r.highlight && (
-                  <span className="text-xs px-1.5 py-0.5 rounded bg-emerald-700/50 text-emerald-300">{r.highlight}</span>
+                  <span className={`text-xs px-1.5 py-0.5 rounded ${r.currency === "CAD" || r.highlight === "CAD" ? "bg-amber-700/50 text-amber-300" : "bg-emerald-700/50 text-emerald-300"}`}>{r.highlight}</span>
                 )}
                 {r.name === cheapest?.name && !r.highlight && (
                   <span className="text-xs px-1.5 py-0.5 rounded bg-emerald-700/50 text-emerald-300">Cheapest</span>
@@ -91,10 +93,27 @@ export default function DomainCard({ domain, tld, status, categoryEmoji, categor
                 <ExternalLink className="w-3 h-3 text-gray-500 group-hover:text-gray-300 transition" />
               </div>
             </a>
-          ))}
+            );
+          })}
           {registrars.length > 4 && (
             <p className="text-xs text-gray-500 text-center pt-0.5">+{registrars.length - 4} more registrars</p>
           )}
+        </div>
+      )}
+
+      {/* DomainWheel discovery link — shown for all statuses */}
+      {status !== "checking" && status !== "idle" && (
+        <div className="mt-3 pt-3 border-t border-gray-700/50">
+          <a
+            href={getDomainWheelUrl(domain)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-xs text-gray-400 hover:text-violet-300 transition group"
+          >
+            <span>🔍</span>
+            <span>Find similar ideas on <span className="underline underline-offset-2">DomainWheel</span></span>
+            <ExternalLink className="w-3 h-3 opacity-60 group-hover:opacity-100 transition" />
+          </a>
         </div>
       )}
     </div>
